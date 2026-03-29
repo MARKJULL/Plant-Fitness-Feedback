@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Jull Family Vacation · Summer 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand:#F5EFE0;--cream:#FAF7F2;--bark:#3D2B1F;--rust:#C4522A;--gold:#D4A017;--sage:#5C7A5F;--sky:#4A7FA5;
+    --border:rgba(61,43,31,0.12);--shadow:0 4px 24px rgba(61,43,31,0.10);--radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--bark);min-height:100vh;overflow-x:hidden;}
+  .hero{background:var(--bark);color:var(--sand);padding:48px 20px 36px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,0.02) 40px,rgba(255,255,255,0.02) 41px);}
+  .hero-icon{font-size:36px;margin-bottom:8px;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,48px);font-weight:900;letter-spacing:-0.5px;line-height:1.1;}
+  .hero p{margin-top:8px;color:var(--gold);font-size:13px;font-weight:500;letter-spacing:2px;text-transform:uppercase;}
+  .hero-dates{display:flex;justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap;}
+  .hero-badge{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:99px;font-size:12px;color:var(--sand);}
+  .nav{display:flex;background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav-btn{flex:1;min-width:80px;padding:14px 8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#999;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+  .nav-btn.active{color:var(--rust);border-bottom-color:var(--rust);}
+  .nav-btn span{display:block;font-size:18px;margin-bottom:2px;}
+  .page{display:none;padding:20px 16px 100px;max-width:600px;margin:0 auto;}
+  .page.active{display:block;}
+  .loading{text-align:center;padding:60px 20px;}
+  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--rust);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{font-size:14px;color:#999;}
+  .error-card{background:#FFF5F5;border:1px solid #FFC5C5;border-radius:var(--radius);padding:20px;text-align:center;margin:20px 0;}
+  .error-card h3{color:#c0392b;margin-bottom:8px;}
+  .error-card p{font-size:13px;color:#666;line-height:1.5;}
+  .retry-btn{margin-top:12px;padding:10px 24px;background:var(--rust);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+  .section-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--rust);margin:28px 0 12px;}
+  .summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .summary-item{background:white;border-radius:14px;padding:14px 12px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .summary-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1;}
+  .summary-lbl{font-size:11px;color:#999;margin-top:4px;}
+  .blue{color:var(--sky);}.green{color:var(--sage);}.rust{color:var(--rust);}
+  .gap-card{background:linear-gradient(135deg,#FFF8E7,#FFF3D4);border:1px solid var(--gold);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+  .gap-card-title{font-weight:600;font-size:14px;color:#a07800;}
+  .gap-card-text{font-size:13px;color:#6b5500;margin-top:6px;line-height:1.5;}
+  .timeline{position:relative;padding-left:32px;}
+  .timeline::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--gold),var(--rust),var(--sky));border-radius:2px;}
+  .t-item{position:relative;margin-bottom:16px;animation:fadeUp 0.4s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .t-dot{position:absolute;left:-26px;top:16px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:1;}
+  .dot-hotel{background:var(--sage);}.dot-flight{background:var(--sky);}.dot-drive{background:var(--gold);}.dot-event{background:var(--rust);}
+  .t-card{background:white;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .t-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .t-card-title{font-weight:600;font-size:15px;line-height:1.3;}
+  .t-card-sub{font-size:12px;color:#888;margin-top:3px;}
+  .t-badge{font-size:10px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+  .badge-hotel{background:rgba(92,122,95,0.12);color:var(--sage);}
+  .badge-flight{background:rgba(74,127,165,0.12);color:var(--sky);}
+  .badge-drive{background:rgba(212,160,23,0.12);color:#a07800;}
+  .badge-event{background:rgba(196,82,42,0.12);color:var(--rust);}
+  .t-card-detail{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;}
+  .t-detail-item{font-size:12px;}
+  .t-detail-label{color:#999;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;display:block;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;}
+  .cal-day-label{text-align:center;font-size:10px;font-weight:600;color:#999;padding:4px 0;}
+  .cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:500;}
+  .cal-day.empty{opacity:0;}
+  .cal-day.chicago{background:rgba(74,127,165,0.15);color:var(--sky);font-weight:700;}
+  .cal-day.appleton{background:rgba(92,122,95,0.15);color:var(--sage);font-weight:700;}
+  .cal-day.transit{background:rgba(212,160,23,0.15);color:#a07800;font-weight:700;}
+  .cal-day.travel{background:rgba(196,82,42,0.12);color:var(--rust);font-weight:700;}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .cal-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;}
+  .cal-legend-dot{width:12px;height:12px;border-radius:4px;}
+  .cal-event{background:white;border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid var(--rust);box-shadow:var(--shadow);}
+  .cal-event.hotel{border-color:var(--sage);}.cal-event.flight{border-color:var(--sky);}.cal-event.drive{border-color:var(--gold);}
+  .cal-event-date{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.8px;}
+  .cal-event-title{font-weight:600;font-size:14px;margin-top:2px;}
+  .cal-event-time{font-size:12px;color:#777;margin-top:4px;}
+  .detail-section{background:white;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:16px;}
+  .detail-header{padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+  .detail-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .icon-hotel{background:rgba(92,122,95,0.12);}.icon-flight{background:rgba(74,127,165,0.12);}.icon-drive{background:rgba(212,160,23,0.12);}.icon-event{background:rgba(196,82,42,0.12);}
+  .detail-header-text{flex:1;}
+  .detail-header-title{font-weight:600;font-size:15px;}
+  .detail-header-sub{font-size:12px;color:#888;margin-top:2px;}
+  .detail-chevron{font-size:12px;color:#ccc;transition:transform 0.2s;}
+  .detail-section.open .detail-chevron{transform:rotate(180deg);}
+  .detail-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+  .detail-section.open .detail-body{display:block;}
+  .detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);gap:12px;}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-row-label{font-size:12px;color:#999;min-width:100px;}
+  .detail-row-value{font-size:13px;font-weight:500;text-align:right;flex:1;}
+  .conf-number{font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:var(--rust);background:rgba(196,82,42,0.08);padding:4px 10px;border-radius:6px;letter-spacing:1px;}
+  .edit-section{background:white;border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .edit-section h3{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#888;margin-bottom:6px;}
+  .form-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--cream);color:var(--bark);transition:border-color 0.2s;-webkit-appearance:none;}
+  .form-input:focus{outline:none;border-color:var(--rust);background:white;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;width:100%;margin-top:8px;}
+  .btn-primary{background:var(--rust);color:white;}
+  .btn-primary:hover{background:#a8421e;}
+  .btn-primary:disabled{background:#ccc;cursor:not-allowed;}
+  .btn-secondary{background:transparent;color:var(--rust);border:1.5px solid var(--rust);}
+  .add-event-form{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+  .add-event-form.open{display:block;}
+  .sync-bar{padding:9px 16px;text-align:center;font-size:12px;font-weight:500;display:none;}
+  .sync-bar.show{display:block;}
+  .sync-bar.syncing{background:rgba(74,127,165,0.1);color:var(--sky);}
+  .sync-bar.success{background:rgba(92,122,95,0.1);color:var(--sage);}
+  .sync-bar.error{background:rgba(196,82,42,0.1);color:var(--rust);}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bark);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-icon">✈️</div>
+  <h1>Jull Family Vacation</h1>
+  <p>Summer 2026 · Chicago & Wisconsin</p>
+  <div class="hero-dates">
+    <span class="hero-badge">📅 Jul 17 → Jul 24</span>
+    <span class="hero-badge">👨‍👩‍👦‍👦 Family of 4</span>
+    <span class="hero-badge">8 days</span>
+  </div>
+</div>
+<div class="sync-bar" id="sync-bar"></div>
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('dashboard',this)"><span>🗺️</span>Overview</button>
+  <button class="nav-btn" onclick="showPage('calendar',this)"><span>📅</span>Calendar</button>
+  <button class="nav-btn" onclick="showPage('details',this)"><span>📋</span>Details</button>
+  <button class="nav-btn" onclick="showPage('edit',this)"><span>✏️</span>Edit</button>
+</nav>
+<div id="page-dashboard" class="page active"><div class="loading"><div class="spinner"></div><div class="loading-text">Loading your trip...</div></div></div>
+<div id="page-calendar" class="page"><div class="loading"><div class="spinner"></div><div class="loading-text">Loading calendar...</div></div></div>
+<div id="page-details" class="page"><div class="loading"><div class="spinner"></div><div class="loading-text">Loading details...</div></div></div>
+<div id="page-edit" class="page"><div class="loading"><div class="spinner"></div><div class="loading-text">Loading editor...</div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyDdy_84WumkAbo7itrKTdr85iSvnqNRtWiHhRFVVmn6yDrLLit41FLEhwPaikV-sJY/exec';
+const ICONS={hotel:'🏨',flight:'✈️',drive:'🚗',event:'📌'};
+const DOT_CLASS={hotel:'dot-hotel',flight:'dot-flight',drive:'dot-drive',event:'dot-event'};
+const BADGE_CLASS={hotel:'badge-hotel',flight:'badge-flight',drive:'badge-drive',event:'badge-event'};
+const BADGE_LBL={hotel:'Hotel',flight:'Flight',drive:'Drive',event:'Activity'};
+const ICON_CLASS={hotel:'icon-hotel',flight:'icon-flight',drive:'icon-drive',event:'icon-event'};
+let state={events:[],details:{},loaded:false,error:null};
+let currentPage='dashboard';
+
+async function api(params){
+  const url=SCRIPT_URL+'?'+new URLSearchParams(params);
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('Network error '+res.status);
+  const text=await res.text();
+  try{return JSON.parse(text);}catch(e){throw new Error('Bad response from server');}
+}
+
+async function loadData(){
+  setSyncBar('syncing','🔄 Loading from Google Sheets...');
+  try{
+    const[events,details]=await Promise.all([api({action:'getEvents'}),api({action:'getDetails'})]);
+    if(!Array.isArray(events)) throw new Error('Unexpected response');
+    state.events=events.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    state.details=details||{};
+    state.loaded=true;state.error=null;
+    setSyncBar('success','✓ Synced · '+new Date().toLocaleTimeString());
+    setTimeout(()=>setSyncBar('',''),3000);
+  }catch(e){
+    state.error=e.message;
+    setSyncBar('error','⚠️ Could not load — check connection');
+  }
+  renderPage(currentPage);
+}
+
+function setSyncBar(type,msg){
+  const b=document.getElementById('sync-bar');
+  b.className='sync-bar'+(type?' show '+type:'');
+  b.textContent=msg;
+}
+
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  currentPage=name;
+  renderPage(name);
+}
+
+function renderPage(name){
+  if(!state.loaded&&!state.error) return;
+  if(name==='dashboard') renderDashboard();
+  if(name==='calendar') renderCalendar();
+  if(name==='details') renderDetails();
+  if(name==='edit') renderEdit();
+}
+
+function errHTML(){
+  return`<div class="error-card"><h3>⚠️ Could not load data</h3>
+  <p>${state.error||'Unknown error'}<br><br>Check your connection and try again.</p>
+  <button class="retry-btn" onclick="loadData()">↺ Retry</button></div>`;
+}
+
+function renderDashboard(){
+  const el=document.getElementById('page-dashboard');
+  if(state.error){el.innerHTML=errHTML();return;}
+  const hotels=state.events.filter(e=>e.type==='hotel').length;
+  const flights=state.events.filter(e=>e.type==='flight').length;
+  el.innerHTML=`
+  <div class="summary-strip" style="margin-top:20px;">
+    <div class="summary-item"><div class="summary-num blue">8</div><div class="summary-lbl">nights away</div></div>
+    <div class="summary-item"><div class="summary-num green">${hotels}</div><div class="summary-lbl">hotels</div></div>
+    <div class="summary-item"><div class="summary-num rust">${flights}</div><div class="summary-lbl">flights</div></div>
+  </div>
+  <div class="gap-card" style="margin-top:16px;">
+    <div class="gap-card-title">⚠️ Gap Day — July 23–24</div>
+    <div class="gap-card-text">Check-out Appleton 11 AM · Flight ORD 5:30 PM. ~3 hr drive back — full day to fill.</div>
+  </div>
+  <div class="section-label">Trip Timeline</div>
+  <div class="timeline">
+  ${state.events.map(ev=>`
+    <div class="t-item">
+      <div class="t-dot ${DOT_CLASS[ev.type]||'dot-event'}">${ICONS[ev.type]||'📌'}</div>
+      <div class="t-card">
+        <div class="t-card-header">
+          <div><div class="t-card-title">${ev.title}</div><div class="t-card-sub">${ev.dateLabel||ev.date}</div></div>
+          <span class="t-badge ${BADGE_CLASS[ev.type]||'badge-event'}">${BADGE_LBL[ev.type]||ev.type}</span>
+        </div>
+        ${ev.timeStart||ev.notes?`<div class="t-card-detail">
+          ${ev.timeStart?`<div class="t-detail-item"><span class="t-detail-label">From</span>${ev.timeStart}</div>`:''}
+          ${ev.timeEnd?`<div class="t-detail-item"><span class="t-detail-label">To</span>${ev.timeEnd}</div>`:''}
+          ${ev.notes?`<div class="t-detail-item" style="width:100%"><span class="t-detail-label">Notes</span>${ev.notes}</div>`:''}
+        </div>`:''}
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderCalendar(){
+  const el=document.getElementById('page-calendar');
+  if(state.error){el.innerHTML=errHTML();return;}
+  const dc={};
+  for(let d=17;d<=20;d++) dc[d]='chicago';
+  for(let d=21;d<=22;d++) dc[d]='appleton';
+  dc[23]='transit';dc[24]='travel';
+  const days=['M','T','W','T','F','S','S'];
+  let grid=days.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  for(let i=0;i<2;i++) grid+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=31;d++) grid+=`<div class="cal-day ${dc[d]||''}">${d}</div>`;
+  const evList=[
+    {date:'Fri, Jul 17',title:'Arrive Chicago ✈️',time:'Check-in Embassy Suites 4:00 PM',cls:'flight'},
+    {date:'Fri Jul 17 – Tue Jul 21',title:'🏨 Embassy Suites, Magnificent Mile',time:'4 nights · Chicago, IL',cls:'hotel'},
+    {date:'Tue, Jul 21',title:'🚗 Drive to Appleton, Wisconsin',time:'After 11:00 AM checkout · ~2.5 hrs',cls:'drive'},
+    {date:'Tue Jul 21 – Thu Jul 23',title:'🏨 Economy Inn, Appleton',time:'2 nights · Check-in 3:00 PM',cls:'hotel'},
+    {date:'Thu, Jul 23',title:'⚠️ Gap Day — Head toward Chicago',time:'Check-out 11 AM · Flexible day',cls:'drive'},
+    {date:'Fri, Jul 24',title:'✈️ WestJet WS 1611 — Home to Calgary',time:'Departs ORD 5:30 PM · Arrives YYC 8:25 PM',cls:'flight'},
+    ...state.events.filter(e=>e.type==='event').map(e=>({date:e.dateLabel||e.date,title:e.title,time:e.notes,cls:'event'}))
+  ];
+  el.innerHTML=`
+  <div class="section-label" style="margin-top:20px;">July 2026</div>
+  <div class="cal-grid">${grid}</div>
+  <div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(74,127,165,0.3)"></div>Chicago</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(92,122,95,0.3)"></div>Appleton</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(212,160,23,0.3)"></div>Transit</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(196,82,42,0.2)"></div>Flight</div>
+  </div>
+  <div class="section-label">Daily Breakdown</div>
+  ${evList.map(e=>`<div class="cal-event ${e.cls}">
+    <div class="cal-event-date">${e.date}</div>
+    <div class="cal-event-title">${e.title}</div>
+    ${e.time?`<div class="cal-event-time">${e.time}</div>`:''}
+  </div>`).join('')}`;
+}
+
+function renderDetails(){
+  const el=document.getElementById('page-details');
+  if(state.error){el.innerHTML=errHTML();return;}
+  el.innerHTML=`<div class="section-label" style="margin-top:20px;">Booking Confirmations</div>`+
+  state.events.map(ev=>{
+    const det=state.details[String(ev.id)]||{};
+    const rows=Object.entries(det).map(([k,v])=>`
+      <div class="detail-row">
+        <span class="detail-row-label">${k}</span>
+        <span class="detail-row-value">${k==='Confirmation'&&v!=='—'?`<span class="conf-number">${v}</span>`:v}</span>
+      </div>`).join('');
+    return`<div class="detail-section" id="det-${ev.id}">
+      <div class="detail-header" onclick="toggleDetail('det-${ev.id}')">
+        <div class="detail-icon ${ICON_CLASS[ev.type]||'icon-event'}">${ICONS[ev.type]||'📌'}</div>
+        <div class="detail-header-text">
+          <div class="detail-header-title">${ev.title}</div>
+          <div class="detail-header-sub">${ev.dateLabel||ev.date}</div>
+        </div>
+        <div class="detail-chevron">▼</div>
+      </div>
+      <div class="detail-body">
+        ${rows||'<div style="padding:10px 0;font-size:13px;color:#999;">No details yet.</div>'}
+        <div class="form-group" style="margin-top:12px;">
+          <div class="form-label">Notes</div>
+          <input class="form-input" value="${ev.notes||''}" placeholder="Add notes..."
+            onchange="saveField('${ev.id}','notes',this.value,this)">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetail(id){document.getElementById(id).classList.toggle('open');}
+
+function renderEdit(){
+  const el=document.getElementById('page-edit');
+  if(state.error){el.innerHTML=errHTML();return;}
+  el.innerHTML=`<div class="section-label" style="margin-top:20px;">Edit Bookings</div>`+
+  state.events.map(ev=>{
+    const det=state.details[String(ev.id)]||{};
+    // Parse existing dates and times from stored values
+    const startDate=ev.startDate||ev.date||'';
+    const endDate=ev.endDate||'';
+    const startTime=ev.startTime||ev.timeStart||'';
+    const endTime=ev.endTime||ev.timeEnd||'';
+    const flightNum=ev.flightNumber||'';
+    return`<div class="edit-section">
+      <h3>${ICONS[ev.type]||'📌'} ${ev.title}</h3>
+
+      ${ev.type==='flight'?`
+      <div class="form-group"><label class="form-label">✈️ Flight Number</label>
+        <input class="form-input" value="${flightNum}" placeholder="e.g. WS 1611"
+          onchange="saveField('${ev.id}','flightNumber',this.value,this)"
+          style="font-weight:600;letter-spacing:1px;"></div>
+      `:''}
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">${ev.type==='hotel'?'Check-in Date':'Start Date'}</label>
+          <input class="form-input" type="date" value="${startDate}"
+            onchange="saveField('${ev.id}','startDate',this.value,this);updateDateLabel('${ev.id}')"></div>
+        <div class="form-group"><label class="form-label">${ev.type==='hotel'?'Check-out Date':'End Date'}</label>
+          <input class="form-input" type="date" value="${endDate}"
+            onchange="saveField('${ev.id}','endDate',this.value,this);updateDateLabel('${ev.id}')"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">${ev.type==='flight'?'Departure Time':ev.type==='hotel'?'Check-in Time':'Start Time'}</label>
+          <input class="form-input" type="time" value="${to24h(startTime)}"
+            onchange="saveField('${ev.id}','startTime',to12h(this.value),this);saveField('${ev.id}','timeStart',to12h(this.value),null)"></div>
+        <div class="form-group"><label class="form-label">${ev.type==='flight'?'Arrival Time':ev.type==='hotel'?'Check-out Time':'End Time'}</label>
+          <input class="form-input" type="time" value="${to24h(endTime)}"
+            onchange="saveField('${ev.id}','endTime',to12h(this.value),this);saveField('${ev.id}','timeEnd',to12h(this.value),null)"></div>
+      </div>
+
+      <div class="form-group"><label class="form-label">Display Label <span style="font-weight:400;color:#bbb">(auto-updated from dates)</span></label>
+        <input class="form-input" id="datelabel-${ev.id}" value="${ev.dateLabel||''}"
+          onchange="saveField('${ev.id}','dateLabel',this.value,this)"></div>
+
+      <div class="form-group"><label class="form-label">Notes</label>
+        <input class="form-input" value="${ev.notes||''}" placeholder="Notes..."
+          onchange="saveField('${ev.id}','notes',this.value,this)"></div>
+
+      ${Object.entries(det).filter(([k])=>!['Check-in','Check-out'].includes(k)).map(([k,v])=>`
+        <div class="form-group"><label class="form-label">${k}</label>
+          <input class="form-input" value="${v==='—'?'':v}" placeholder="${k}..."
+            onchange="saveDetail('${ev.id}','${k}',this.value,this)"></div>`).join('')}
+    </div>`;
+  }).join('')+`
+  <div class="edit-section">
+    <h3>➕ Add New Event</h3>
+    <button class="btn btn-secondary" onclick="toggleAddForm()">Add Activity / Booking</button>
+    <div class="add-event-form" id="add-event-form">
+      <div class="form-group"><label class="form-label">Title</label>
+        <input class="form-input" id="new-title" placeholder="e.g. Willis Tower Visit"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date</label>
+          <input class="form-input" id="new-date" type="date"></div>
+        <div class="form-group"><label class="form-label">Type</label>
+          <select class="form-input" id="new-type">
+            <option value="event">Activity</option>
+            <option value="hotel">Hotel</option>
+            <option value="flight">Flight</option>
+            <option value="drive">Drive</option>
+          </select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label>
+        <input class="form-input" id="new-notes" placeholder="Times, confirmation numbers, etc."></div>
+      <button class="btn btn-primary" id="add-btn" onclick="addEvent()">💾 Save to Google Sheets</button>
+    </div>
+  </div>`;
+}
+
+async function saveField(id,field,value,inputEl){
+  if(inputEl) inputEl.style.borderColor='var(--gold)';
+  try{
+    await api({action:'saveEvent',id,field,value});
+    const ev=state.events.find(e=>String(e.id)===String(id));
+    if(ev) ev[field]=value;
+    if(inputEl){inputEl.style.borderColor='var(--sage)';setTimeout(()=>inputEl.style.borderColor='',2000);}
+    showToast('Saved ✓');
+  }catch(e){
+    if(inputEl) inputEl.style.borderColor='var(--rust)';
+    showToast('⚠️ Save failed — try again');
+  }
+}
+
+async function saveDetail(eventId,key,value,inputEl){
+  if(inputEl) inputEl.style.borderColor='var(--gold)';
+  try{
+    await api({action:'saveDetail',eventId,key,value});
+    if(!state.details[String(eventId)]) state.details[String(eventId)]={};
+    state.details[String(eventId)][key]=value||'—';
+    if(inputEl){inputEl.style.borderColor='var(--sage)';setTimeout(()=>inputEl.style.borderColor='',2000);}
+    showToast('Saved ✓');
+  }catch(e){
+    if(inputEl) inputEl.style.borderColor='var(--rust)';
+    showToast('⚠️ Save failed — try again');
+  }
+}
+
+async function addEvent(){
+  const title=document.getElementById('new-title').value.trim();
+  const date=document.getElementById('new-date').value;
+  const type=document.getElementById('new-type').value;
+  const notes=document.getElementById('new-notes').value.trim();
+  if(!title||!date){showToast('Please add a title and date');return;}
+  const btn=document.getElementById('add-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  const d=new Date(date+'T12:00:00');
+  const dateLabel=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const newId='c'+Date.now();
+  const newEv={id:newId,type,title,subtitle:notes,date,dateLabel,timeStart:'',timeEnd:'',notes};
+  try{
+    await api({action:'addEvent',...newEv});
+    state.events.push(newEv);
+    state.events.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    document.getElementById('new-title').value='';
+    document.getElementById('new-date').value='';
+    document.getElementById('new-notes').value='';
+    document.getElementById('add-event-form').classList.remove('open');
+    showToast('Event added ✓');
+    renderEdit();
+  }catch(e){showToast('⚠️ Could not save — try again');}
+  btn.disabled=false;btn.textContent='💾 Save to Google Sheets';
+}
+
+function toggleAddForm(){document.getElementById('add-event-form').classList.toggle('open');}
+
+function to24h(str){
+  if(!str) return '';
+  if(/^\d{2}:\d{2}$/.test(str)) return str;
+  const m=str.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if(!m) return '';
+  let h=parseInt(m[1]),min=m[2],period=m[3].toUpperCase();
+  if(period==='PM'&&h!==12) h+=12;
+  if(period==='AM'&&h===12) h=0;
+  return String(h).padStart(2,'0')+':'+min;
+}
+
+function to12h(str){
+  if(!str) return '';
+  const[hStr,min]=str.split(':');
+  let h=parseInt(hStr);
+  const period=h>=12?'PM':'AM';
+  if(h>12) h-=12;
+  if(h===0) h=12;
+  return h+':'+min+' '+period;
+}
+
+function updateDateLabel(id){
+  const ev=state.events.find(e=>String(e.id)===String(id));
+  if(!ev) return;
+  const labelEl=document.getElementById('datelabel-'+id);
+  if(!labelEl) return;
+  const start=ev.startDate||ev.date;
+  const end=ev.endDate;
+  if(!start) return;
+  const fmt=(d)=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const label=end&&end!==start?fmt(start)+' – '+fmt(end):fmt(start);
+  labelEl.value=label;
+  saveField(id,'dateLabel',label,null);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+loadData();
+</script>
+</body>
+</html>
